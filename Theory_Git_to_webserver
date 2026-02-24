@@ -1,0 +1,54 @@
+Let's create a Basic Jenkins Pipeline which uses the Git to push the code and deploy it in TomcatWebServer
+
+Prerequistes: this is Java application so we're using Jenkins declarative pipeline, Maven as Build, SonarQube for CQA, Nexus as Artifact repository, Tomcat as Web Server
+
+Step1: Pull the code from GitHub. we can get from
+  1. public repo
+      . main branch
+      . feature/some other branch
+  2. private repo
+
+S2: Code Build
+WHAT DOES BUILD Mean: Developers write the code in Java/some programming language which is human-readable. Build is used to convert this human-readable lang into machine-readable languagei.e changing source code into something system can run
+1. compling the code
+2.resolve dependencies
+3. run unit test
+4. output an artifact: used to run in an server
+ Above dependencies are stored in pom.xml which is present in same git repo where code is stored.
+Step2: Build the code using Maven
+  1. mvn clean package
+  Issues encountered in Build Phase due to wrong/incorrect POM.XML
+  1. Versioning conflicts: 
+  2. Dependency not found
+  3. XML not found
+  4. versioning not configured
+  Want to go into how to debug version conflicts specifically using mvn dependency:tree
+
+S3: CodeQualityAnalysis
+CQA        = the discipline of continuously measuring code quality
+SonarQube  = the tool that automates CQA inside your Jenkins pipeline
+
+S4: Artifactory Registry
+Push all the war files to nexus repo
+This is single source of truth to deploy the file to Tomcat server
+
+S5: Deploy to WebServer
+War file is pulled from Nexus repo and tomcat unpacks it automatically
+-------------------
+What Happens to the File in Jenkins Workspace After Pipeline
+This is something most beginners don't know:
+After pipeline finishes:
+  /var/lib/jenkins/workspace/payment-service/target/
+  → stays there until next build runs
+
+Next build runs mvn clean:
+  → target/ folder DELETED completely
+  → rebuilt from scratch
+
+This is why you NEVER rely on Jenkins workspace
+for storing artifacts long term
+→ That's exactly why Nexus exists
+
+  
+  
+  
